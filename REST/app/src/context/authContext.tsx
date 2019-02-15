@@ -8,7 +8,7 @@ export interface IAuthContext {
 }
 
 export const initialAuthContext: IAuthContext = {
-    isAuthenticated: false,
+    isAuthenticated: undefined,
 };
 export const AuthContext = React.createContext(initialAuthContext);
 

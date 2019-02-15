@@ -2,6 +2,7 @@ import * as React from "react";
 import {Login} from "./login/Login";
 import {AuthContext} from "../context/authContext";
 import {Home} from "./home/Home";
+import {Loading} from "./loading/Loading";
 interface IAppState {
     isAuthenticated?: boolean;
 }
@@ -21,12 +22,14 @@ export class App extends React.PureComponent<IAppProps> {
         return (
             <AuthContext.Consumer>
                 {(context) => {
-                    if (context.isAuthenticated) {
-                        return <Home/>
+                    switch(context.isAuthenticated) {
+                        case false:
+                            return <Login/>;
+                        case true:
+                            return <Home/>;
+                        default:
+                            return <Loading/>;
                     }
-                    return (
-                        <Login/>
-                    )
                 }}
             </AuthContext.Consumer>
         );

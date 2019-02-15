@@ -5,7 +5,10 @@ interface IHomeProps {}
 export class Home extends React.PureComponent<IHomeProps> {
     public render() {
         return (
-            <h1>Home</h1>
-        )
+            <React.Fragment>
+                <h1>Home</h1>
+                <div>is where we define protected routes</div>
+            </React.Fragment>
+        );
     }
 }
