@@ -76,15 +76,22 @@ class UserController {
 
     public verifyToken = (req: express.Request, res: express.Response) => {
         const userToken = req.get("token");
-        if (!userToken) {
+        const userId = req.get("_id");
+        if (!userToken || !userId) {
             res.status(400);
             return res.json({err: "Invalid token"});
         }
 
         try {
-            const decoded = token.verify(userToken);
-            res.status(200);
-            return res.json({data: decoded});
+            const decoded = token.verify(userToken) as any;
+            if (decoded._id && decoded._id === userId) {
+                res.status(200)
+                return res.json({data: decoded});
+            }
+
+            res.status(403);
+            return res.json({err: "Invalid token"})
+
         }
         catch (err) {
             res.status(403)
