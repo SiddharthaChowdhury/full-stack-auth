@@ -19,7 +19,7 @@ export class AuthContextProvider extends PureComponent<IAuthContext> {
         return(
             <AuthContext.Provider value={{
                 ...this.state,
-                changeAuth: this.changeToAuthenticated,
+                changeAuth: this.login,
                 logout: this.logout,
             }}>
                 {this.props.children}
@@ -27,6 +27,8 @@ export class AuthContextProvider extends PureComponent<IAuthContext> {
         );
     }
 
-    private changeToAuthenticated = () => this.setState({isAuthenticated: true});
+    private login = () => {
+        return this.setState({isAuthenticated: true})
+    };
     private logout = () => this.setState({isAuthenticated: false});
 }

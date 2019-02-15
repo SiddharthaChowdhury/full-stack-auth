@@ -18,30 +18,25 @@ const initialState: ILoginState = {user: "", password: "", message: "", redirect
 
 export class Login extends React.PureComponent<ILoginProps> {
     public state: ILoginState = initialState;
+    static contextType = AuthContext;
     constructor (props: ILoginProps) {
         super(props);
     }
     public render() {
         return (
-            <AuthContext.Consumer>
-                {(context) => {
-                    return (
-                        <React.Fragment>
-                            <h3>{this.state.message}</h3>
-                            <div>
-                                <label>Username </label>
-                                <input onChange={this.handleChange} type="text" name="user" value={this.state.user}/>
-                            </div>
-                            <br/>
-                            <div>
-                                <label>Password </label>
-                                <input onChange={this.handleChange} type="password" name="password" value={this.state.password}/>
-                            </div>
-                            <button onClick={context.changeAuth}>Login</button>
-                        </React.Fragment>
-                    )
-                }}
-            </AuthContext.Consumer>
+            <React.Fragment>
+                <h3>{this.state.message}</h3>
+                <div>
+                    <label>Username </label>
+                    <input onChange={this.handleChange} type="text" name="user" value={this.state.user}/>
+                </div>
+                <br/>
+                <div>
+                    <label>Password </label>
+                    <input onChange={this.handleChange} type="password" name="password" value={this.state.password}/>
+                </div>
+                <button onClick={this.makeLogin}>Login</button>
+            </React.Fragment>
         )
     }
 
@@ -58,16 +53,13 @@ export class Login extends React.PureComponent<ILoginProps> {
             email: this.state.user!,
             password: this.state.password!,
         };
-        console.log("IS error")
-        auth.auth(authInfo, (err, msg) => {
+        auth.login(authInfo, (err, msg) => {
             if(err){
                 console.log("IS error")
-                this.setState({...this.state, message: err.toString()});
+                this.setState({message: err.toString()});
                 return;
             }
-
-            console.log("IS Success")
-            this.setState({...this.state, redirectHome: true});
+            this.context.changeAuth();
         })
     }
 }
