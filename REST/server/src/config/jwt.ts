@@ -1,9 +1,10 @@
 import * as fs from "fs";
 import * as jwt from "jsonwebtoken";
+import path from "path";
 import {ITokenOptions} from "../types/token";
 
-const privateKEY = fs.readFileSync('../RSA/private.key', 'utf8');
-const publicKEY = fs.readFileSync('../RSA/public.key', 'utf8');
+const privateKEY = fs.readFileSync(path.join(__dirname, '../../RSA/private.key'), 'utf8');
+const publicKEY = fs.readFileSync(path.join(__dirname, '../../RSA/public.key'), 'utf8');
 
 const signOptions: ITokenOptions = {
     issuer: 'Austin4Silvers', // usually organization
@@ -27,4 +28,4 @@ class JWT {
     }
 }
 
-export default new JWT();
+export const token = new JWT();
