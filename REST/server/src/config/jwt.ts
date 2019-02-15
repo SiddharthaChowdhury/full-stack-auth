@@ -23,7 +23,7 @@ class JWT {
         try {
             return jwt.verify(token, publicKEY, verifyOptions);
         } catch (err) {
-            return err;
+            throw err;
         }
     }
 }

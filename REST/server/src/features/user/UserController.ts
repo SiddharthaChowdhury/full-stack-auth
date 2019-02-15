@@ -70,8 +70,26 @@ class UserController {
             })
 
             res.status(200);
-            return res.json({msg: "Login successful", token: jwt})
+            return res.json({msg: "Login successful", token: jwt, issued: (+ new Date), _id: user._id.toString()})
         })
+    };
+
+    public verifyToken = (req: express.Request, res: express.Response) => {
+        const userToken = req.get("token");
+        if (!userToken) {
+            res.status(400);
+            return res.json({err: "Invalid token"});
+        }
+
+        try {
+            const decoded = token.verify(userToken);
+            res.status(200);
+            return res.json({data: decoded});
+        }
+        catch (err) {
+            res.status(403)
+            return res.json({err})
+        }
     }
 }
 

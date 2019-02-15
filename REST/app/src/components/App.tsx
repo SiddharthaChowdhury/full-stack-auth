@@ -34,4 +34,8 @@ export class App extends React.PureComponent<IAppProps> {
             </AuthContext.Consumer>
         );
     }
+
+    public componentDidMount(): void {
+
+    }
 }

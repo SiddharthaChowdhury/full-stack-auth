@@ -9,6 +9,7 @@ const routes = ($: express.Router) => {
 
     $.post('/user-create', userController.createUser);
     $.post('/user-login', userController.login);
+    $.get('/token-verify', userController.verifyToken)
 
 return $};
 
