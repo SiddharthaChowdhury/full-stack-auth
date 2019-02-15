@@ -1,0 +1,38 @@
+{
+  "name": "rest-server",
+  "version": "1.0.0",
+  "description": "express, jsonwebtoken, typescript",
+  "main": "index.js",
+  "scripts": {
+    "tsc": "tsc",
+    "clean": "rm -rf build",
+    "start": "npm run start:DEV",
+    "start:DEV": "npm run clean && npm run tsc && cross-env NODE_ENV=development nodemon build/server.js",
+    "start:PROD": "npm run clean && tsc && cross-env NODE_ENV=production nodemon build/server.js"
+  },
+  "keywords": [
+    "express",
+    "mongodb",
+    "jsonwebtoken",
+    "typescript"
+  ],
+  "author": "austin4silvers",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "bcrypt": "^3.0.4",
+    "cors": "^2.8.5",
+    "cross-env": "^5.2.0",
+    "express": "^4.16.4",
+    "jsonwebtoken": "^8.4.0",
+    "mongoose": "^5.4.12",
+    "nodemon": "^1.18.10",
+    "typescript": "^3.3.3"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.4",
+    "@types/express": "^4.16.1",
+    "@types/jsonwebtoken": "^8.3.0",
+    "@types/mongoose": "^5.3.17"
+  }
+}

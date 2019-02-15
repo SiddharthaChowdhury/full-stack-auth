@@ -1,0 +1,9 @@
+{
+  "env":{
+    "MONGO_USER": "",
+    "MONGO_PASSWORD": "",
+    "MONGO_DB": "",
+
+    "MONGO_URL_LOCAL_CONN": "mongodb://localhost/testdb"
+  }
+}
