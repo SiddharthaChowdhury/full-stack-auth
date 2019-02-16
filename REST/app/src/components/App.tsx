@@ -3,6 +3,7 @@ import {Login} from "./login/Login";
 import {AuthContext} from "../context/authContext";
 import {Home} from "./home/Home";
 import {Loading} from "./loading/Loading";
+import auth from "./login/auth";
 interface IAppState {
     isAuthenticated?: boolean;
 }
@@ -14,12 +15,15 @@ const initialState: IAppState = {
 
 export class App extends React.PureComponent<IAppProps> {
     public state: IAppState = initialState;
+    static contextType = AuthContext;
+
     constructor (props: IAppProps) {
         super(props)
     }
 
     public render() {
         return (
+            // just another way of using context
             <AuthContext.Consumer>
                 {(context) => {
                     switch(context.isAuthenticated) {
@@ -36,6 +40,14 @@ export class App extends React.PureComponent<IAppProps> {
     }
 
     public componentDidMount(): void {
+        auth.verifyAuth((err, data) => {
+            if (err){
+                this.context.unAuthorize();
+                return;
+            }
 
+            this.context.authorize();
+            return;
+        })
     }
 }

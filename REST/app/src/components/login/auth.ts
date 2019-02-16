@@ -1,5 +1,5 @@
 import axios, {AxiosError, AxiosResponse} from "axios";
-import {IdPersistence, utilPersistence} from "../../utils/utilPersistence";
+import {IdPersistence, IUtilPersistenceAuth, utilPersistence} from "../../utils/utilPersistence";
 import {API, IAPI, IAuthRequest} from "../../utils/api";
 
 class Auth {
@@ -16,7 +16,13 @@ class Auth {
             data: authInfo
         })
             .then(function (response: AxiosResponse) {
-                utilPersistence.setValue(IdPersistence.auth, {token: response.data.token, rememberMe: true});
+                const authInfo: IUtilPersistenceAuth = {
+                    token: response.data.token,
+                    rememberMe: true,
+                    issuedAt: response.data.issued,
+                    _id: response.data._id
+                };
+                utilPersistence.setValue(IdPersistence.auth, authInfo);
                 cb(undefined, response.data);
                 return;
             })
@@ -32,14 +38,24 @@ class Auth {
         cb();
     };
 
-    // public isAuthenticated = (token: string) => {
-    //     const api: IAPI = API.VERIFY_USER;
-    //     return axios({
-    //         method: api.method,
-    //         url: api.url,
-    //         headers: {'token': token}
-    //     })
-    // }
+    public verifyAuth = (cb: (err?: Error, msg?: string) => any) => {
+        const authInfo: IUtilPersistenceAuth = utilPersistence.getValue(IdPersistence.auth);
+        const api: IAPI = API.VERIFY_USER;
+        axios({
+            method: api.method,
+            url: api.url,
+            headers: {
+                'token': authInfo.token,
+                '_id': authInfo._id
+            }
+        }).then((response) => {
+            cb(undefined, response.data);
+            return;
+        }).catch((err) => {
+            cb(err, undefined);
+            return;
+        })
+    }
 }
 
 export default new Auth();

@@ -9,9 +9,11 @@ export const enum IdPersistence {
 }
 
 const persistenceStorageKey = "docketyinc";
-interface IUtilPersistenceAuth {
+export interface IUtilPersistenceAuth {
     token: string;
+    issuedAt?: number;
     rememberMe: boolean;
+    _id?: string;
 }
 const initialAuth: IUtilPersistenceAuth = {
     token: "",

@@ -7,8 +7,7 @@ export interface IAPI {
 
 export const API = {
     LOGIN: {url: domain+'/user-login', method: 'post'},
-    // UPLOAD: {url: domain+'/upload', method: 'post'},
-    VERIFY_USER: {url: '/token-verify', method: 'get'},
+    VERIFY_USER: {url: domain+'/token-verify', method: 'get'},
 };
 
 // todo: need a script to pull these information from `ws-nas` repo

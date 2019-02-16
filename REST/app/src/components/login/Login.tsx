@@ -50,8 +50,8 @@ export class Login extends React.PureComponent<ILoginProps> {
     private makeLogin = () => {
         const {user, password} = this.state;
         const authInfo: IAuthRequest = {
-            email: this.state.user!,
-            password: this.state.password!,
+            email: user!,
+            password: password!,
         };
         auth.login(authInfo, (err, msg) => {
             if(err){
@@ -59,7 +59,7 @@ export class Login extends React.PureComponent<ILoginProps> {
                 this.setState({message: err.toString()});
                 return;
             }
-            this.context.changeAuth();
+            this.context.authorize();
         })
     }
 }

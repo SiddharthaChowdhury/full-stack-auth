@@ -3,8 +3,8 @@ import {PureComponent} from "react";
 
 export interface IAuthContext {
     isAuthenticated?: boolean;
-    changeAuth?: () => any;
-    logout?: () => any;
+    authorize?: () => any;
+    unAuthorize?: () => any;
 }
 
 export const initialAuthContext: IAuthContext = {
@@ -19,16 +19,16 @@ export class AuthContextProvider extends PureComponent<IAuthContext> {
         return(
             <AuthContext.Provider value={{
                 ...this.state,
-                changeAuth: this.login,
-                logout: this.logout,
+                authorize: this.authorize,
+                unAuthorize: this.unAuthorize,
             }}>
                 {this.props.children}
             </AuthContext.Provider>
         );
     }
 
-    private login = () => {
+    private authorize = () => {
         return this.setState({isAuthenticated: true})
     };
-    private logout = () => this.setState({isAuthenticated: false});
+    private unAuthorize = () => this.setState({isAuthenticated: false});
 }
