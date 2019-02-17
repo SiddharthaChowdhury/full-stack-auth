@@ -2,10 +2,9 @@ import express from "express";
 import bcrypt from "bcrypt";
 import {ICreateUserRequest, ILoginRequest, IUser} from "../../types/typeUser";
 import User from "../../schema/User";
-import {token} from "../../config/jwt";
-import requestIp from "request-ip";
-import UserAgent = ExpressUseragent.UserAgent;
+import {token} from "../../util/jwt";
 import {ITokenPayload} from "../../types/token";
+import requestIp from "request-ip";
 
 class UserController {
     public createUser = (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -35,7 +34,7 @@ class UserController {
                     ...params,
                     password: hash,
                     createdAt: Date.now()
-                })
+                });
 
                 user.save()
                     .then((user) => {
@@ -51,17 +50,13 @@ class UserController {
     };
 
     public login = (req: express.Request, res: express.Response) => {
-        const ip = requestIp.getClientIp(req);
-        const client: UserAgent| undefined = req.useragent;
-        if(!ip || !client){
-            res.status(403);
-            return res.json({err: "Failed to identify your internet connection. Consider changing connection to another network!"});
-        }
+
         const params: ILoginRequest = req.body;
         if (!params.email || !params.password) {
             res.status(400);
             return res.json({error: "Email and Password are mandatory"});
         }
+
 
         User.findOne({email: params.email}, (err, user: IUser) => {
             if(err) {
@@ -84,15 +79,17 @@ class UserController {
                     return res.json({err: "Authentication failed!"})
                 }
 
+                const {browser, os, version, city, country, region} = req.params;
                 const jwtPayload: ITokenPayload = {
                     _id: user._id.toString(),
-                    ip,
-                    browser: client.browser,
-                    version: client.version,
-                    os: client.os,
-                    source: client.source,
+                    ip: requestIp.getClientIp(req),
+                    browser,
+                    version,
+                    os,
+                    country,
+                    city,
+                    region,
                 };
-
                 const jwt: string = token.create(jwtPayload);
 
                 res.status(200);
@@ -104,31 +101,27 @@ class UserController {
     public verifyToken = (req: express.Request, res: express.Response) => {
         const userToken = req.get("token");
         const userId = req.get("_id");
+
         if (!userToken || !userId) {
             res.status(400);
             return res.json({err: "Invalid token"});
         }
 
-        const client: UserAgent | undefined = req.useragent;
-        const ip = requestIp.getClientIp(req);
-        if(!ip || !client){
-            res.status(403);
-            return res.json({err: "Failed to identify your internet connection. Consider changing connection to another network!"});
-        }
-
         try {
             const decoded: ITokenPayload = token.verify(userToken) as any;
             if (decoded._id && decoded._id === userId) {
-
+                const {browser, os, ip, version, city, country, region} = req.params;
                 if (
                     decoded.ip !== ip ||
-                    decoded.browser !== client.browser ||
-                    decoded.version !== client.version ||
-                    decoded.os !== client.os
-                    // decoded.source |== client.source
+                    decoded.browser !== browser ||
+                    decoded.version !== version ||
+                    decoded.os !== os ||
+                    decoded.city !== city ||
+                    decoded.country !== country ||
+                    decoded.region !== region
                 ) {
                     res.status(403);
-                    return res.json({err: "Invalid token"})
+                    return res.json({err: "Invalid token", decoded, params: req.params})
                 }
 
                 res.status(200);

@@ -7,7 +7,17 @@ export interface IUser {
 }
 
 export interface ICreateUserRequest extends IUser {}
-export interface ILoginRequest {
+export interface IAuthInfo{
+    country?: string;
+    city?: string;
+    region?: string;
+    ip?: string;
+    browser?: string;
+    version?: string;
+    os?: string;
+    source?: string;
+}
+export interface ILoginRequest extends IAuthInfo{
     email: string;
     password: string;
 }

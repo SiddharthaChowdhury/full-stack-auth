@@ -13,4 +13,7 @@ export interface ITokenPayload {
     version?: string;
     os?: string;
     source?: string;
+    country?: string;
+    city?: string;
+    region?: string;
 }

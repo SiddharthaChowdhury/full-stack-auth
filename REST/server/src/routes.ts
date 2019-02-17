@@ -1,6 +1,7 @@
 import express from "express";
 import {userController} from "./features/user/UserController";
 import requestIp from "request-ip";
+import {authCheck} from "./middleware/authCheck";
 
 const routes = ($: express.Router) => {
 
@@ -10,8 +11,8 @@ const routes = ($: express.Router) => {
     });
 
     $.post('/user-create', userController.createUser);
-    $.post('/user-login', userController.login);
-    $.get('/token-verify', userController.verifyToken);
+    $.post('/user-login', authCheck.checkGeoIP, userController.login);
+    $.get('/token-verify', authCheck.checkGeoIP,userController.verifyToken);
 
 return $};
 
