@@ -1,8 +1,11 @@
 import express from "express";
 import bcrypt from "bcrypt";
-import {ICreateUserRequest, ILoginRequest} from "../../types/typeUser";
+import {ICreateUserRequest, ILoginRequest, IUser} from "../../types/typeUser";
 import User from "../../schema/User";
 import {token} from "../../config/jwt";
+import requestIp from "request-ip";
+import UserAgent = ExpressUseragent.UserAgent;
+import {ITokenPayload} from "../../types/token";
 
 class UserController {
     public createUser = (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -45,16 +48,22 @@ class UserController {
                     })
             })
         });
-    }
+    };
 
     public login = (req: express.Request, res: express.Response) => {
+        const ip = requestIp.getClientIp(req);
+        const client: UserAgent| undefined = req.useragent;
+        if(!ip || !client){
+            res.status(403);
+            return res.json({err: "Failed to identify your internet connection. Consider changing connection to another network!"});
+        }
         const params: ILoginRequest = req.body;
         if (!params.email || !params.password) {
             res.status(400);
             return res.json({error: "Email and Password are mandatory"});
         }
 
-        User.findOne({email: params.email}, (err, user) => {
+        User.findOne({email: params.email}, (err, user: IUser) => {
             if(err) {
                 res.status(500);
                 return res.json({err: err});
@@ -65,12 +74,30 @@ class UserController {
                 return res.json({msg: "Authentication failed!"});
             }
 
-            const jwt: string = token.create({
-                _id: user._id.toString(),
-            })
+            bcrypt.compare(params.password, user.password, function(err, isValid: boolean) {
+                if (err) {
+                    res.status(500);
+                    return res.json({err: err})
+                }
+                if (!isValid) {
+                    res.status(403);
+                    return res.json({err: "Authentication failed!"})
+                }
 
-            res.status(200);
-            return res.json({msg: "Login successful", token: jwt, issued: (+ new Date), _id: user._id.toString()})
+                const jwtPayload: ITokenPayload = {
+                    _id: user._id.toString(),
+                    ip,
+                    browser: client.browser,
+                    version: client.version,
+                    os: client.os,
+                    source: client.source,
+                };
+
+                const jwt: string = token.create(jwtPayload);
+
+                res.status(200);
+                return res.json({msg: "Login successful", token: jwt, issued: (+ new Date), _id: user._id.toString()})
+            });
         })
     };
 
@@ -82,10 +109,29 @@ class UserController {
             return res.json({err: "Invalid token"});
         }
 
+        const client: UserAgent | undefined = req.useragent;
+        const ip = requestIp.getClientIp(req);
+        if(!ip || !client){
+            res.status(403);
+            return res.json({err: "Failed to identify your internet connection. Consider changing connection to another network!"});
+        }
+
         try {
-            const decoded = token.verify(userToken) as any;
+            const decoded: ITokenPayload = token.verify(userToken) as any;
             if (decoded._id && decoded._id === userId) {
-                res.status(200)
+
+                if (
+                    decoded.ip !== ip ||
+                    decoded.browser !== client.browser ||
+                    decoded.version !== client.version ||
+                    decoded.os !== client.os
+                    // decoded.source |== client.source
+                ) {
+                    res.status(403);
+                    return res.json({err: "Invalid token"})
+                }
+
+                res.status(200);
                 return res.json({data: decoded});
             }
 
