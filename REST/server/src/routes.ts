@@ -13,6 +13,13 @@ const routes = ($: express.Router) => {
     $.post('/user-create', userController.createUser);
     $.post('/user-login', authCheck.checkGeoIP, userController.login);
     $.get('/token-verify', authCheck.checkGeoIP,userController.verifyToken);
+    // LOGOUT feature
+    /*
+    * JWT can't be expired manually
+    * BUT In production:
+    * 1. I would store { userID: [activeTokens] } from loggedIn systems inside a Database (SQL)
+    * 2. Run CronJobs to remove expired tokens from database
+    * */
 
 return $};
 
