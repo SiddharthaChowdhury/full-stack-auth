@@ -35,7 +35,7 @@ class PostController {
             })
     };
 
-    private getUserByID = (userID: string) => {
+    public getUserByID = (userID: string) => {
         return User.findOne(userID)
             .then((user: any) => {
                 if (!user) {
